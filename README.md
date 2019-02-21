@@ -1,1 +1,3 @@
-# DeleteOldMessageOnSlack
+Python勉強がてらSlackで何かやってみるやつ。
+
+１万件制限のためになんとかしていく予定
