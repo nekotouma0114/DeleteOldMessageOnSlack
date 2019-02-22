@@ -16,15 +16,29 @@ class Slack:
     def channel_id(self):
         self._channel_id = id
 
-    def print_messages(self):
+    #
+    # get channel history,but dont check Errors in ['ok']
+    # @return json() or None
+    #
+    def get_channel_history(self,channel_id = None):
+        #setting params
+        channel_id = self.channel_id if channel_id is None else channel_id
         channel_parm ={
             "token"     : self.token,
-            "channel"   : self.channel_id
+            "channel"   : channel_id
         }
+        #get message on slack channel
         history_request = requests.get(self.history_api,params=channel_parm)
         history_data = history_request.json()
+        #Error check
         if history_data['ok']:
-            history_message = history_data['messages']
-            [print (msg['text']) for msg in history_message if "reactions" not in msg.keys()]
+            return history_data
         else:
-            print("cannot get history data")
+            print("Error type:"+ history_data['ok'] +"\n Process exit...")
+            sys.exit()
+
+    #debug method
+    def print_messages(self):
+        history_data = self.get_channel_history()
+        history_message = history_data['messages']
+        [print (msg['text']) for msg in history_message if "reactions" not in msg.keys()]

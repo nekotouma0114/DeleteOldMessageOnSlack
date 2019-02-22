@@ -8,6 +8,7 @@ def main():
     slack.print_messages()
 
 #
+#   TODO:confの形式検討
 #   @params
 #   @return
 #
