@@ -12,20 +12,15 @@ class Slack:
         else:
             self.channel_id = id
 
-
-    def channel_id(self):
-        self._channel_id = id
-
     #
     # get channel history,but dont check Errors in ['ok']
     # @return json() or None
     #
-    def get_channel_history(self,channel_id = None):
+    def get_channel_history(self):
         #setting params
-        channel_id = self.channel_id if channel_id is None else channel_id
         channel_parm ={
             "token"     : self.token,
-            "channel"   : channel_id
+            "channel"   : self.channel_id
         }
         #get message on slack channel
         history_request = requests.get(self.history_api,params=channel_parm)
@@ -36,6 +31,12 @@ class Slack:
         else:
             print("Error type:"+ history_data['ok'] +"\n Process exit...")
             sys.exit()
+
+    def delete_messages_in_channel(self):
+        pass
+
+    def change_channel(self,channel_id):
+        self.channel_id = channel_id
 
     #debug method
     def print_messages(self):
