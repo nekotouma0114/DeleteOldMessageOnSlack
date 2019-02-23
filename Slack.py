@@ -1,3 +1,6 @@
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/api')
 import requests
 import urllib,urllib.request
 from datetime import datetime
