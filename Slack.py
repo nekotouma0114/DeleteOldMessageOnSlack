@@ -1,6 +1,7 @@
 import requests
 import urllib,urllib.request
 from datetime import datetime
+import time
 
 class Slack:
 
@@ -27,10 +28,10 @@ class Slack:
             # if count is under 1,dont get message in slack and return empty
             print ("get_channel_history \"count\" is " + count)
             return ""
-        elif count > 100 :
+        elif count > 1000 :
             # max "count" parms is 1000 by use of slack
-            remaining_count = count - 100 if count - 100 > 0 else 0
-            count = 100
+            remaining_count = count - 1000 if count - 1000 > 0 else 0
+            count = 1000
         else:
             remaining_count = 0
 
@@ -46,7 +47,7 @@ class Slack:
         history_data = history_request.json()
         #Error check
         if history_data['ok']:
-            if remaining_count == 0 or not history_data['has_more']:
+            if remaining_count <= 0 or not history_data['has_more']:
                 return history_data
             #get more remaining oldest_post
             #TODO : Maybe this cannnot get next latest post,
@@ -71,8 +72,30 @@ class Slack:
     #   but keep messages "count" post
     #   and newer than keep_date
     #ß
-    def delete_messages_in_channel(self,keep_count=10000,keep_date='1970/01/01'):
-        pass
+    def delete_channel_messages(self,keep_count=10000,keep_date='1970-01-01'):
+        channel_messages = self.get_channel_messages()
+        #oder by ts desc
+        if channel_messages[0]['ts'] > channel_messages[-1]['ts']:
+            channel_messages.reverse()
+
+        # keep_date is tranced string to unixtime
+        keep_date = datetime.timestamp(datetime.fromisoformat(keep_date))
+        messages_count = len(channel_messages)
+        delete_count = 0
+
+        #Delete message by date
+        while float(channel_messages[delete_count]['ts']) < keep_date :
+            self.delete_message(channel_messages[delete_count]['ts'])
+            delete_count += 1
+        #Delete message by count
+        while messages_count - delete_count > keep_count :
+            self.delete_message(channel_messages[delete_count]['ts'])
+            delete_count += 1
+
+
+
+        return delete_count
+
 
     #
     #   Delete 'ts' message
@@ -84,7 +107,8 @@ class Slack:
             "channel"   :self.channel_id,
             "ts"        :ts
         }
-        history_request = requests.get(self.delete_api,params=delete_parm)
+        time.sleep(1)
+        history_request = requests.get(self.delete_api,params=delete_params)
         response = history_request.json()
 
         if not response['ok']:
