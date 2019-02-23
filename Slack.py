@@ -71,15 +71,18 @@ class Slack:
     #   delete messages in channel,
     #   but keep messages "count" post
     #   and newer than keep_date
-    #ß
-    def delete_channel_messages(self,keep_count=10000,keep_date='1970-01-01'):
+    #   @param  keep_count : int
+    #   @param  keep_date  : datetime
+    #   @return delete_count
+    #
+    def delete_channel_messages(self,keep_count=10000,keep_date=datetime.fromisoformat('1970-01-01')):
         channel_messages = self.get_channel_messages()
         #oder by ts desc
         if channel_messages[0]['ts'] > channel_messages[-1]['ts']:
             channel_messages.reverse()
 
         # keep_date is tranced string to unixtime
-        keep_date = datetime.timestamp(datetime.fromisoformat(keep_date))
+        keep_date = datetime.timestamp(keep_date)
         messages_count = len(channel_messages)
         delete_count = 0
 
@@ -99,7 +102,7 @@ class Slack:
 
     #
     #   Delete 'ts' message
-    #
+    #   sleep For continuous requests
     #
     def delete_message(self,ts):
         delete_params = {
