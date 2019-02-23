@@ -20,7 +20,7 @@ class Slack:
     # @params count : Get "count" messages From the latest post
     # @params latest: Latest time of post in datetime format
     # @return json() of history or None
-    # TODO : can i get post from oldest?ß
+    # TODO : can i get post from oldest?
     #
     def get_channel_history(self,count = 10000,latest= datetime.now()):
         # "count" should be set between 1 ando 1000
