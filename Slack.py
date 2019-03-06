@@ -7,12 +7,10 @@ from datetime import datetime
 import time
 
 class Slack:
-
+    DELETE_API="https://slack.com/api/chat.delete"
+    history_api="https://slack.com/api/channels.history"
     def __init__(self,general_info,id=None):
-        self.delete_api=general_info['delete_api']
-        self.history_api= general_info['history_api']
         self.token=general_info['token']
-        self.workspace=general_info['workspace']
         if id == None :
             self.channel_id=general_info['channel_id']
         else:
@@ -111,7 +109,7 @@ class Slack:
             "ts"        :ts
         }
         time.sleep(1)
-        history_request = requests.get(self.delete_api,params=delete_params)
+        history_request = requests.get(self.DELETE_API,params=delete_params)
         response = history_request.json()
 
         if not response['ok']:
