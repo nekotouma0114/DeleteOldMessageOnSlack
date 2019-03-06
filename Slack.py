@@ -8,7 +8,7 @@ import time
 
 class Slack:
     DELETE_API="https://slack.com/api/chat.delete"
-    history_api="https://slack.com/api/channels.history"
+    HISTORY_API="https://slack.com/api/channels.history"
     def __init__(self,general_info,id=None):
         self.token=general_info['token']
         if id == None :
@@ -44,7 +44,7 @@ class Slack:
             "latest"    : latest.timestamp()
         }
         #get message on slack channel
-        history_request = requests.get(self.history_api,params=channel_parm)
+        history_request = requests.get(self.HISTORY_API,params=channel_parm)
         history_data = history_request.json()
         #Error check
         if history_data['ok']:
