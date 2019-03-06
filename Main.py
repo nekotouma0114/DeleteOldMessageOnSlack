@@ -22,10 +22,7 @@ def read_config(file_path):
     general_info = dict()
     try:
         #Workspaceの共通情報を読み込む
-        general_info["delete_api"]  = ini_file.get("General","delete_api")
-        general_info["history_api"] = ini_file.get("General","history_api")
         general_info["token"] = ini_file.get("General","token")
-        general_info["workspace"] = ini_file.get("General","workspace")
 
         #channel情報を読み込む。複数channelに対応できる様になんとかする予定
         general_info["channel_id"] = ini_file.get("channel1","id")
