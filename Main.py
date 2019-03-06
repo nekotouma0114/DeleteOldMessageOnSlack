@@ -1,14 +1,15 @@
 import configparser
 import datetime
-import Slack;
+import Slack
 
 def main():
     slack_params = read_config("./setting.ini")
     slack = Slack.Slack(slack_params)
     #delete post when 2weeks ago or 500 post
     delete_count = slack.delete_channel_messages(500,datetime.datetime.now() - datetime.timedelta(weeks=2))
-    #TODO : post in slack if delete_count > 0 
-
+    #TODO : post in slack if delete_count > 0
+    print (delete_count)
+    return delete_count
 
 #
 #   TODO:confの形式検討
@@ -36,4 +37,4 @@ def read_config(file_path):
     return general_info
 
 if __name__ == '__main__':
-    main();
+    main()
