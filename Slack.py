@@ -50,15 +50,14 @@ class Slack:
         history_data = history_request.json()
         #Error check
         if history_data['ok']:
-            if remaining_count <= 0 or not history_data['has_more']:
-                return history_data
             #get more remaining oldest_post
             #TODO : Maybe this cannnot get next latest post,
             #     :if oldest post and next latest post are some time
-            else :
+            if remaining_count > 0 and history_data['has_more']:
                 oldest_post_time = datetime.fromtimestamp(float(history_data['messages'][-1]['ts']))
                 history_data['messages'].extend(self.get_channel_history(remaining_count,oldest_post_time)['messages'])
-                return history_data
+
+            return history_data
         #when return history_date has any problems
         else :
             print("Error type:"+ history_data['ok'] +"\n Process exit...")
@@ -97,8 +96,6 @@ class Slack:
         while messages_count - delete_count > keep_count :
             self.delete_message(channel_messages[delete_count]['ts'])
             delete_count += 1
-
-
 
         return delete_count
 

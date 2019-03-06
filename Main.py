@@ -8,7 +8,7 @@ def main():
     #delete post when 2weeks ago or 500 post
     delete_count = slack.delete_channel_messages(500,datetime.datetime.now() - datetime.timedelta(weeks=2))
     #TODO : post in slack if delete_count > 0
-
+    print (delete_count)
     return delete_count
 
 #
@@ -35,3 +35,6 @@ def read_config(file_path):
         return null;
 
     return general_info
+
+if __name__ == '__main__':
+    main()
