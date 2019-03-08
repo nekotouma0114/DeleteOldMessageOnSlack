@@ -48,7 +48,7 @@ class DeleteMessages(GetMessages):
     #   Delete 'ts' message
     #   sleep For continuous requests
     #
-    def delete_message(self,ts):
+    def delete_message(self,ts,count = 0):
         delete_params = {
             "token"     :self.token,
             "channel"   :self.channel_id,
@@ -59,4 +59,11 @@ class DeleteMessages(GetMessages):
         response = history_request.json()
 
         if not response['ok']:
-            print("cannnot delete message :" + ts)
+            #If cannot delete message,there's a possibility that many request  in short time
+            #Use sleep and try again when that case
+            #but if it continues 3 times,skip and go next message
+            if count < 3:
+                sleep(0.1)
+                self.delete_message(ts,count + 1)
+            else:
+                print ("Cannnot delete message : " + ts)

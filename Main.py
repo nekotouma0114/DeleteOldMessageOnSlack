@@ -6,7 +6,7 @@ def main():
     slack_params = read_config("./setting.ini")
     slack = DeleteMessages(slack_params)
     #delete post when 2weeks ago or 500 post
-    delete_count = slack.delete_channel_messages(5,datetime.datetime.now() - datetime.timedelta(weeks=1))
+    delete_count = slack.delete_channel_messages(100,datetime.datetime.now() - datetime.timedelta(weeks=1))
     #TODO : post in slack if delete_count > 0
     print (delete_count)
     return delete_count
