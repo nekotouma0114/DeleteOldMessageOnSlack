@@ -1,15 +1,21 @@
 import configparser
 import datetime
 from DeleteMessages import DeleteMessages
+from SlackFuntions import SlackFunctions
+from PostMessages import PostMessages
 
 def main():
     slack_params = read_config("./setting.ini")
-    slack = DeleteMessages(slack_params)
+    deleteMessages = DeleteMessages(slack_params)
     #delete post when 2weeks ago or 500 post
-    delete_count = slack.delete_channel_messages(4,datetime.datetime.now() - datetime.timedelta(weeks=1))
+    delete_messages = deleteMessages.delete_channel_messages(500,datetime.datetime.now() - datetime.timedelta(weeks=1))
     #TODO : post in slack if delete_count > 0
-    print (delete_count)
-    return delete_count
+    if len(delete_messages) > 0:
+        repost_messages = SlackFunctions.get_has_reaction_messages(delete_messages)
+        if len(repost_messages) > 0:
+            repost_text = SlackFunctions.get_text_in_messages(repost_messages)
+            post_messages = PostMessages(slack_params)
+            post_messages.post_messages(repost_text)
 
 #
 #   TODO:confの形式検討
@@ -28,7 +34,7 @@ def read_config(file_path):
         general_info["channel_id"] = ini_file.get("channel1","id")
     except:
         #exceptが発生したパラメータを判別できる様になんとかする予定
-        print ("any keywork is not found")
+        print ("any keyword is not found")
         return null;
 
     return general_info
