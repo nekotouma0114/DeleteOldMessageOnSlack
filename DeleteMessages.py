@@ -36,16 +36,16 @@ class DeleteMessages(GetMessages):
         #Delete message by date
         while float(channel_messages[delete_count]['ts']) < keep_date :
             message_temp = channel_messages[delete_count]
-            delete_count += 1
             if self.delete_message(channel_messages[delete_count]['ts']):
                 delete_messages.append(message_temp)
+            delete_count += 1
 
         #Delete message by count
         while messages_count - delete_count > keep_count :
             message_temp = channel_messages[delete_count]
-            delete_count += 1
             if self.delete_message(channel_messages[delete_count]['ts']):
                 delete_messages.append(message_temp)
+            delete_count += 1
 
         return delete_messages
 
