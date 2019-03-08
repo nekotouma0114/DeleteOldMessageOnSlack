@@ -62,13 +62,14 @@ class DeleteMessages(GetMessages):
             "ts"        :ts
         }
 
-        history_request = requests.get(self.DELETE_API,params=delete_params)
-        response = history_request.json()
+        delete_request = requests.get(self.DELETE_API,params=delete_params)
+        response = delete_request.json()
 
         if not response['ok']:
             #If cannot delete message,there's a possibility that many request  in short time
             #Use sleep and try again when that case
             #but if it continues 3 times,skip and go next message
+            #TODO:Cehck error messages as failed request
             if count < 3:
                 sleep(0.1)
                 self.delete_message(ts,count + 1)
