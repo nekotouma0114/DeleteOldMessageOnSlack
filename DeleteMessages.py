@@ -22,6 +22,7 @@ class DeleteMessages(GetMessages):
     #   @return delete_count
     #
     def delete_channel_messages(self,keep_count=10000,keep_date=datetime.fromisoformat('1970-01-01')):
+        delete_messages = []
         channel_messages = self.get_channel_messages()
         #oder by ts desc
         if channel_messages[0]['ts'] > channel_messages[-1]['ts']:
@@ -34,19 +35,25 @@ class DeleteMessages(GetMessages):
 
         #Delete message by date
         while float(channel_messages[delete_count]['ts']) < keep_date :
-            self.delete_message(channel_messages[delete_count]['ts'])
+            message_temp = channel_messages[delete_count]
             delete_count += 1
+            if self.delete_message(channel_messages[delete_count]['ts']):
+                delete_messages.append(message_temp)
+
         #Delete message by count
         while messages_count - delete_count > keep_count :
-            self.delete_message(channel_messages[delete_count]['ts'])
+            message_temp = channel_messages[delete_count]
             delete_count += 1
+            if self.delete_message(channel_messages[delete_count]['ts']):
+                delete_messages.append(message_temp)
 
-        return delete_count
+        return delete_messages
 
 
     #
     #   Delete 'ts' message
     #   sleep For continuous requests
+    #   @return delete ok
     #
     def delete_message(self,ts,count = 0):
         delete_params = {
@@ -67,3 +74,7 @@ class DeleteMessages(GetMessages):
                 self.delete_message(ts,count + 1)
             else:
                 print ("Cannnot delete message : " + ts)
+        else:
+            return True
+
+        return False
