@@ -22,6 +22,7 @@ class DeleteMessages(GetMessages):
     #   @return delete_count
     #
     def delete_channel_messages(self,keep_count=10000,keep_date=datetime.fromisoformat('1970-01-01')):
+        delete_messages = []
         channel_messages = self.get_channel_messages()
         #oder by ts desc
         if channel_messages[0]['ts'] > channel_messages[-1]['ts']:
@@ -34,19 +35,25 @@ class DeleteMessages(GetMessages):
 
         #Delete message by date
         while float(channel_messages[delete_count]['ts']) < keep_date :
-            self.delete_message(channel_messages[delete_count]['ts'])
-            delete_count += 1
-        #Delete message by count
-        while messages_count - delete_count > keep_count :
-            self.delete_message(channel_messages[delete_count]['ts'])
+            message_temp = channel_messages[delete_count]
+            if self.delete_message(channel_messages[delete_count]['ts']):
+                delete_messages.append(message_temp)
             delete_count += 1
 
-        return delete_count
+        #Delete message by count
+        while messages_count - delete_count > keep_count :
+            message_temp = channel_messages[delete_count]
+            if self.delete_message(channel_messages[delete_count]['ts']):
+                delete_messages.append(message_temp)
+            delete_count += 1
+
+        return delete_messages
 
 
     #
     #   Delete 'ts' message
     #   sleep For continuous requests
+    #   @return delete ok
     #
     def delete_message(self,ts,count = 0):
         delete_params = {
@@ -55,15 +62,20 @@ class DeleteMessages(GetMessages):
             "ts"        :ts
         }
 
-        history_request = requests.get(self.DELETE_API,params=delete_params)
-        response = history_request.json()
+        delete_request = requests.get(self.DELETE_API,params=delete_params)
+        response = delete_request.json()
 
         if not response['ok']:
             #If cannot delete message,there's a possibility that many request  in short time
             #Use sleep and try again when that case
             #but if it continues 3 times,skip and go next message
+            #TODO:Cehck error messages as failed request
             if count < 3:
                 sleep(0.1)
                 self.delete_message(ts,count + 1)
             else:
                 print ("Cannnot delete message : " + ts)
+        else:
+            return True
+
+        return False
