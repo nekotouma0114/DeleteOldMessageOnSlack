@@ -3,19 +3,25 @@ import datetime
 from DeleteMessages import DeleteMessages
 from SlackFuntions import SlackFunctions
 from PostMessages import PostMessages
+from DynamoDB import DynamoDB
 
 def main():
     slack_params = read_config("./setting.ini")
+    dynamoDB = DynamoDB()
+    channel_params = dynamoDB.scan("")
     deleteMessages = DeleteMessages(slack_params)
-    #delete post when 2weeks ago or 500 post
-    delete_messages = deleteMessages.delete_channel_messages(500,datetime.datetime.now() - datetime.timedelta(weeks=1))
-    #TODO : post in slack if delete_count > 0
-    if len(delete_messages) > 0:
-        repost_messages = SlackFunctions.get_has_reaction_messages(delete_messages)
-        if len(repost_messages) > 0:
-            repost_text = SlackFunctions.get_text_in_messages(repost_messages)
-            post_messages = PostMessages(slack_params)
-            post_messages.post_messages(repost_text)
+
+    for channel_param in channel_params:
+        deleteMessages.change_channel(channel_param['channel_id'])
+        #delete post each channel
+        delete_messages = deleteMessages.delete_channel_messages(channel_param['max_messages'],datetime.datetime.now() - datetime.timedelta(days=int(channel_param['keep_days'])))
+        #TODO : post in slack if delete_count > 0
+        if len(delete_messages) > 0:
+            repost_messages = SlackFunctions.get_has_reaction_messages(delete_messages)
+            if len(repost_messages) > 0:
+                repost_text = SlackFunctions.get_text_in_messages(repost_messages)
+                post_messages = PostMessages(slack_params)
+                post_messages.post_messages(repost_text)
 
 #
 #   TODO:confの形式検討
